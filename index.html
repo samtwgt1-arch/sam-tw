@@ -450,6 +450,37 @@
             .badge { font-size: 13px; padding: 8px 14px; }
             .decoration { font-size: 28px; }
         }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            padding: 8px 12px;
+            background: var(--bg-card);
+            border-radius: 100px;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .nav a {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--text);
+        }
+
+        .nav a:hover {
+            background: var(--accent-pink);
+            color: #7D4E6D;
+        }
+
+        .nav a.active {
+            background: linear-gradient(135deg, var(--accent-coral), var(--accent-pink));
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -461,6 +492,11 @@
     <span class="decoration dec-5">🌟</span>
     
     <div class="container">
+        <nav class="nav">
+            <a href="index.html" class="active">🏠 關於我</a>
+            <a href="food.html">🍜 美食園地</a>
+        </nav>
+
         <!-- Hero Section -->
         <div class="hero">
             <div class="avatar-wrapper">

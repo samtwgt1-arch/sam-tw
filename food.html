@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美食園地 | Sam Chiang</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #FFF9F5;
+            --bg-card: #FFFFFF;
+            --text: #5D4E6D;
+            --text-dark: #8B7BA3;
+            --accent-pink: #FFB6C1;
+            --accent-coral: #FF8A80;
+            --accent-mint: #A8E6CF;
+            --accent-lavender: #DDA0DD;
+            --accent-peach: #FFCBA4;
+            --accent-yellow: #FFE66D;
+            --shadow: rgba(255, 182, 193, 0.3);
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #2D2438;
+                --bg-card: #3D3248;
+                --text: #F0E6FA;
+                --text-dark: #B8A8D0;
+                --shadow: rgba(0, 0, 0, 0.3);
+            }
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Quicksand', 'Nunito', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.8;
+            overflow-x: hidden;
+        }
+
+        .decoration {
+            position: fixed;
+            font-size: 40px;
+            opacity: 0.6;
+            z-index: -1;
+            animation: float 6s ease-in-out infinite;
+        }
+        .dec-1 { top: 10%; left: 5%; animation-delay: 0s; }
+        .dec-2 { top: 20%; right: 8%; animation-delay: 1s; }
+        .dec-3 { bottom: 30%; left: 3%; animation-delay: 2s; }
+        .dec-4 { bottom: 15%; right: 5%; animation-delay: 3s; }
+        .dec-5 { top: 50%; right: 3%; animation-delay: 1.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 60px 24px 80px;
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+            padding: 8px 12px;
+            background: var(--bg-card);
+            border-radius: 100px;
+            box-shadow: 0 4px 16px var(--shadow);
+        }
+
+        .nav a {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+            color: var(--text);
+        }
+
+        .nav a:hover {
+            background: var(--accent-pink);
+            color: #7D4E6D;
+        }
+
+        .nav a.active {
+            background: linear-gradient(135deg, var(--accent-coral), var(--accent-pink));
+            color: white;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 48px 32px;
+            background: var(--bg-card);
+            border-radius: 32px;
+            box-shadow: 0 8px 32px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, var(--accent-pink) 0%, transparent 70%);
+            opacity: 0.1;
+            animation: sparkle 8s linear infinite;
+        }
+
+        @keyframes sparkle {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .page-title {
+            font-family: 'Nunito', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-coral), var(--accent-pink), var(--accent-lavender));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 12px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .page-subtitle {
+            font-size: 18px;
+            color: var(--text-dark);
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 32px;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 100px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .filter-btn.all {
+            background: linear-gradient(135deg, var(--accent-mint), var(--accent-peach));
+            color: #3D5A4C;
+        }
+
+        .filter-btn.buffet {
+            background: linear-gradient(135deg, var(--accent-lavender), var(--accent-pink));
+            color: #5D4E6D;
+        }
+
+        .filter-btn.bbq {
+            background: linear-gradient(135deg, var(--accent-coral), var(--accent-yellow));
+            color: #7D4E6D;
+        }
+
+        .filter-btn.hotpot {
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-peach));
+            color: #7D4E6D;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px var(--shadow);
+        }
+
+        .restaurant-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .restaurant-card {
+            background: var(--bg-card);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 8px 32px var(--shadow);
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .restaurant-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(255, 182, 193, 0.4);
+        }
+
+        .card-header {
+            padding: 24px;
+            background: linear-gradient(135deg, #fff8fc 0%, #f8f0ff 100%);
+            border-bottom: 1px solid rgba(255, 182, 193, 0.2);
+            position: relative;
+        }
+
+        .ranking-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, #ffd700, #ffb800);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: white;
+            box-shadow: 0 4px 12px rgba(255, 184, 0, 0.4);
+        }
+
+        .card-type {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, var(--accent-lavender), var(--accent-mint));
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #5D4E6D;
+            margin-bottom: 10px;
+        }
+
+        .card-name {
+            font-family: 'Nunito', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+
+        .card-rating {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stars {
+            color: #ffb800;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        .rating-num {
+            font-size: 14px;
+            color: var(--text-dark);
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 24px;
+        }
+
+        .price-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+
+        .price-item {
+            text-align: center;
+            padding: 12px 8px;
+            background: var(--bg);
+            border-radius: 16px;
+        }
+
+        .price-label {
+            font-size: 11px;
+            color: var(--text-dark);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .price-value {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .card-highlight {
+            padding: 16px;
+            background: linear-gradient(135deg, #fff5f8, #f8f0ff);
+            border-radius: 16px;
+            margin-bottom: 16px;
+        }
+
+        .card-highlight-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent-coral);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .card-highlight-text {
+            font-size: 14px;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .card-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .feature-tag {
+            padding: 6px 12px;
+            background: var(--bg);
+            border-radius: 100px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .card-footer {
+            padding: 16px 24px;
+            background: var(--bg);
+            border-top: 1px solid rgba(255, 182, 193, 0.1);
+        }
+
+        .card-address {
+            font-size: 13px;
+            color: var(--text-dark);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .card-address::before {
+            content: '📍';
+            font-size: 14px;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 48px 20px 24px;
+            font-size: 14px;
+            color: var(--text-dark);
+        }
+
+        .footer-sticker {
+            font-size: 28px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 40px 16px 60px; }
+            .restaurant-grid { grid-template-columns: 1fr; }
+            .page-title { font-size: 32px; }
+            .page-header { padding: 32px 20px; }
+            .price-row { grid-template-columns: repeat(3, 1fr); }
+            .decoration { font-size: 28px; }
+        }
+    </style>
+</head>
+<body>
+    <span class="decoration dec-1">🌸</span>
+    <span class="decoration dec-2">✨</span>
+    <span class="decoration dec-3">🍜</span>
+    <span class="decoration dec-4">🎀</span>
+    <span class="decoration dec-5">🍽️</span>
+
+    <div class="container">
+        <nav class="nav">
+            <a href="index.html">🏠 關於我</a>
+            <a href="food.html" class="active">🍜 美食園地</a>
+        </nav>
+
+        <div class="page-header">
+            <h1 class="page-title">🍜 美食園地</h1>
+            <p class="page-subtitle">台北吃到飽美食精選推薦 ✨</p>
+        </div>
+
+        <div class="filter-bar">
+            <button class="filter-btn all active" onclick="filterAll()">✨ 全部</button>
+            <button class="filter-btn buffet" onclick="filterType('buffet')">🍽️ 高級 Buffet</button>
+            <button class="filter-btn bbq" onclick="filterType('bbq')">🔥 燒肉</button>
+            <button class="filter-btn hotpot" onclick="filterType('hotpot')">🍲 火鍋</button>
+        </div>
+
+        <div class="restaurant-grid" id="restaurantGrid">
+
+            <!-- Rank 1 -->
+            <div class="restaurant-card" data-type="buffet">
+                <div class="card-header">
+                    <span class="ranking-badge">1</span>
+                    <span class="card-type">🥇 頂級 buffet</span>
+                    <h3 class="card-name">🍴 饗饗</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="rating-num">4.8 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$1,980</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$2,280</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$2,480</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">台北最高樓層 buffet，俯瞰信義區夜景！食材頂級，龍蝦、帝王蟹、現切牛排應有盡有，甜點區更是夢幻。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🦞 龍蝦</span>
+                        <span class="feature-tag">🥩 牛排</span>
+                        <span class="feature-tag">🦀 帝王蟹</span>
+                        <span class="feature-tag">🍰 甜點</span>
+                        <span class="feature-tag">🌃 夜景</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">台北市信義區忠孝東路五段68號 微風信義 47樓</div>
+                </div>
+            </div>
+
+            <!-- Rank 2 -->
+            <div class="restaurant-card" data-type="buffet">
+                <div class="card-header">
+                    <span class="ranking-badge">2</span>
+                    <span class="card-type">🥈 日式 buffet</span>
+                    <h3 class="card-name">🍣 旭集</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="rating-num">4.6 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$1,480</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$1,780</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$1,980</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">日式風格精緻優雅，握壽司現點現做超新鮮！燒烤區的牛小排入口即化，清酒選擇也多。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🍣 壽司</span>
+                        <span class="feature-tag">🥩 燒烤</span>
+                        <span class="feature-tag">🍶 清酒</span>
+                        <span class="feature-tag">🍜 拉麵</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">台北市大安區忠孝東路三段300號 SOGO忠孝 11樓</div>
+                </div>
+            </div>
+
+            <!-- Rank 3 -->
+            <div class="restaurant-card" data-type="buffet">
+                <div class="card-header">
+                    <span class="ranking-badge">3</span>
+                    <span class="card-type">🥉 五星 buffet</span>
+                    <h3 class="card-name">🏨 希爾頓</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★★</span>
+                        <span class="rating-num">4.5 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$1,580</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$1,980</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$2,180</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">五星飯店環境，甜點區是最大亮點！提拉米蘇、馬卡龍、法式千層都很有水準。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🥩 牛排</span>
+                        <span class="feature-tag">🍰 甜點</span>
+                        <span class="feature-tag">🍷 紅白酒</span>
+                        <span class="feature-tag">🏨 五星</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">台北市信義區松高路2段6號 台北希爾頓 2樓</div>
+                </div>
+            </div>
+
+            <!-- Rank 4 -->
+            <div class="restaurant-card" data-type="buffet">
+                <div class="card-header">
+                    <span class="ranking-badge" style="background: linear-gradient(135deg, #C0C0C0, #A8A8A8);">4</span>
+                    <span class="card-type">高空景觀</span>
+                    <h3 class="card-name">🌃 Mega 50</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-num">4.5 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$1,380</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$1,680</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$1,880</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">板橋最高樓層 buffet，49樓高空景觀無敵！港式燒臘是特色，烤鴨皮脆肉嫩。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🦆 烤鴨</span>
+                        <span class="feature-tag">🌃 夜景</span>
+                        <span class="feature-tag">🥘 港式</span>
+                        <span class="feature-tag">🏙️ 高空</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">新北市板橋區縣民大道二段66號 Mega 50 49樓</div>
+                </div>
+            </div>
+
+            <!-- Rank 5 -->
+            <div class="restaurant-card" data-type="buffet">
+                <div class="card-header">
+                    <span class="ranking-badge" style="background: linear-gradient(135deg, #C0C0C0, #A8A8A8);">5</span>
+                    <span class="card-type">時尚設計</span>
+                    <h3 class="card-name">✨ 探索廚房</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-num">4.4 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$1,480</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$1,880</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$2,080</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">開放式廚房設計，食材新鮮度佳。異國料理選擇多，環境時尚有質感。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🍳 開放廚房</span>
+                        <span class="feature-tag">🌍 異國</span>
+                        <span class="feature-tag">🥗 沙拉</span>
+                        <span class="feature-tag">🍮 甜點</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">台北市松山區敦化北路100號 寒舍艾美</div>
+                </div>
+            </div>
+
+            <!-- Rank 6 -->
+            <div class="restaurant-card" data-type="buffet">
+                <div class="card-header">
+                    <span class="ranking-badge" style="background: linear-gradient(135deg, #C0C0C0, #A8A8A8);">6</span>
+                    <span class="card-type">宮廷風格</span>
+                    <h3 class="card-name">🏰 十二廚</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-num">4.4 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$1,380</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$1,680</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$1,880</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">歐式宮廷裝潢超氣派！烤鴨是必吃招牌，皮脆肉嫩超juicy。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🦆 烤鴨</span>
+                        <span class="feature-tag">🥩 牛排</span>
+                        <span class="feature-tag">🏰 宮廷</span>
+                        <span class="feature-tag">🦐 海鮮</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">台北市大同區承德路三段275號 君品酒店</div>
+                </div>
+            </div>
+
+            <!-- Rank 7 -->
+            <div class="restaurant-card" data-type="buffet">
+                <div class="card-header">
+                    <span class="ranking-badge" style="background: linear-gradient(135deg, #CD7F32, #B8860B);">7</span>
+                    <span class="card-type">日式風格</span>
+                    <h3 class="card-name">🏯 老爺酒店</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-num">4.3 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$1,380</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$1,680</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$1,880</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">日式風格為主軸，環境清幽典雅。和牛壽喜燒、生魚片都很推薦。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🍲 壽喜燒</span>
+                        <span class="feature-tag">🍣 生魚片</span>
+                        <span class="feature-tag">🍵 茶飲</span>
+                        <span class="feature-tag">🗻 日式</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">台北市中山區中山北路二段37-1號</div>
+                </div>
+            </div>
+
+            <!-- Rank 8 -->
+            <div class="restaurant-card" data-type="buffet">
+                <div class="card-header">
+                    <span class="ranking-badge" style="background: linear-gradient(135deg, #CD7F32, #B8860B);">8</span>
+                    <span class="card-type">CP值首選</span>
+                    <h3 class="card-name">🍽️ 饗食天堂</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-num">4.3 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$759</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$899</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$999</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">CP值最高！分店多方便，菜色涵蓋中、西、日式，適合家庭聚餐。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🍜 中式</span>
+                        <span class="feature-tag">🥩 西式</span>
+                        <span class="feature-tag">🍣 日式</span>
+                        <span class="feature-tag">👨‍👩‍👧 家庭</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">多家分店（信義/京站/板橋等）</div>
+                </div>
+            </div>
+
+            <!-- Rank 9 -->
+            <div class="restaurant-card" data-type="buffet">
+                <div class="card-header">
+                    <span class="ranking-badge" style="background: linear-gradient(135deg, #CD7F32, #B8860B);">9</span>
+                    <span class="card-type">多元料理</span>
+                    <h3 class="card-name">🍜 豐FOOD</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-num">4.2 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$690</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$890</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$990</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">南港cp值選擇，菜色多元。現做披薩和義大利麵是特色。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🍕 披薩</span>
+                        <span class="feature-tag">🍝 義大利麵</span>
+                        <span class="feature-tag">🥗 沙拉吧</span>
+                        <span class="feature-tag">🌏 各國</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">台北市南港區經貿二路166號 南港車站2樓</div>
+                </div>
+            </div>
+
+            <!-- BBQ restaurants -->
+            <div class="restaurant-card" data-type="bbq">
+                <div class="card-header">
+                    <span class="card-type">日式燒肉</span>
+                    <h3 class="card-name">🔥 響 HOT 7</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-num">4.1 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$599</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$699</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$799</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">日式燒肉加壽喜燒，份量十足！肉質不錯，cp值高。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🥩 燒肉</span>
+                        <span class="feature-tag">🍲 壽喜燒</span>
+                        <span class="feature-tag">🍚 白飯</span>
+                        <span class="feature-tag">👥 聚餐</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">多家分店</div>
+                </div>
+            </div>
+
+            <div class="restaurant-card" data-type="bbq">
+                <div class="card-header">
+                    <span class="card-type">頂級燒肉</span>
+                    <h3 class="card-name">🥩 一五一五</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-num">4.2 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$649</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$849</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$949</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">高cp值燒肉店，肉質優秀！牛舌、厚切牛五花是招牌。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">👅 牛舌</span>
+                        <span class="feature-tag">🥩 五花牛</span>
+                        <span class="feature-tag">🦐 海鮮</span>
+                        <span class="feature-tag">🔥 炭火</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">台北市大安區忠孝東路四段101號</div>
+                </div>
+            </div>
+
+            <div class="restaurant-card" data-type="hotpot">
+                <div class="card-header">
+                    <span class="card-type">燒肉+火鍋</span>
+                    <h3 class="card-name">🍲 好客燒烤</h3>
+                    <div class="card-rating">
+                        <span class="stars">★★★★☆</span>
+                        <span class="rating-num">4.0 / 5</span>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="price-row">
+                        <div class="price-item">
+                            <div class="price-label">午餐</div>
+                            <div class="price-value">NT$628</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">晚餐</div>
+                            <div class="price-value">NT$768</div>
+                        </div>
+                        <div class="price-item">
+                            <div class="price-label">假日</div>
+                            <div class="price-value">NT$868</div>
+                        </div>
+                    </div>
+                    <div class="card-highlight">
+                        <div class="card-highlight-title">🌟 推薦原因</div>
+                        <div class="card-highlight-text">燒肉加火鍋兩種願望一次滿足！海鮮食材新鮮，適合多人聚餐。</div>
+                    </div>
+                    <div class="card-features">
+                        <span class="feature-tag">🔥 燒肉</span>
+                        <span class="feature-tag">🍲 火鍋</span>
+                        <span class="feature-tag">🦐 海鮮</span>
+                        <span class="feature-tag">🍺 啤酒</span>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="card-address">台北市信義區忠孝東路四段301號</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="footer-sticker">🍜✨</div>
+            <p>美食園地 | 由 Sam Chiang 整理分享</p>
+            <p style="margin-top: 8px; font-size: 12px;">💡 資料僅供參考，實際價格以店家公告為準</p>
+        </div>
+    </div>
+
+    <script>
+        function filterAll() {
+            document.querySelectorAll('.restaurant-card').forEach(card => {
+                card.style.display = 'block';
+            });
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('.filter-btn.all').classList.add('active');
+        }
+
+        function filterType(type) {
+            document.querySelectorAll('.restaurant-card').forEach(card => {
+                if (card.dataset.type === type) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
