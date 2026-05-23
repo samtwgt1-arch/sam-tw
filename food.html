@@ -409,6 +409,18 @@
             <button class="filter-btn hotpot" onclick="filterType('hotpot')">🍲 火鍋</button>
         </div>
 
+        <div class="search-section" style="margin-bottom: 32px; text-align: center;">
+            <input type="text" id="searchInput" placeholder="🔍 搜尋美食關鍵字...（如：龍蝦、牛排、日式）"
+                style="width: 100%; max-width: 480px; padding: 14px 20px; border-radius: 100px; border: 2px solid var(--accent-pink); font-size: 15px; font-family: inherit; outline: none; background: var(--bg-card); color: var(--text); box-shadow: 0 4px 16px var(--shadow);"
+                onkeydown="if(event.key==='Enter')searchFood()">
+            <button onclick="searchFood()" style="margin-left: 10px; padding: 14px 28px; border-radius: 100px; border: none; background: linear-gradient(135deg, var(--accent-coral), var(--accent-pink)); color: white; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit;">
+                搜尋
+            </button>
+            <div id="searchStatus" style="margin-top: 12px; font-size: 14px; color: var(--text-dark); min-height: 24px;"></div>
+        </div>
+
+        <div class="search-results" id="searchResults"></div>
+
         <div class="restaurant-grid" id="restaurantGrid">
 
             <!-- Rank 1 -->
@@ -919,26 +931,122 @@
         </div>
     </div>
 
-    <script>
+    // ─── 搜尋功能 ───
+        // 目前使用靜態卡片，搜尋結果會 highlight 現有卡片
+        const API_BASE = 'https://ext-mini-warehouse-mai.trycloudflare.com';
+
+        async function searchFood() {
+            const q = document.getElementById('searchInput').value.trim();
+            const status = document.getElementById('searchStatus');
+            const resultsDiv = document.getElementById('searchResults');
+
+            if (!q) {
+                status.innerHTML = '⚠️ 請輸入搜尋關鍵字';
+                return;
+            }
+
+            status.innerHTML = '🔍 搜尋中...';
+            resultsDiv.innerHTML = '';
+
+            try {
+                const res = await fetch(`${API_BASE}/api/search?q=${encodeURIComponent(q)}&top_k=5`);
+                if (!res.ok) throw new Error('API 錯誤');
+                const data = await res.json();
+                const hits = data.results || [];
+
+                if (hits.length === 0) {
+                    status.innerHTML = `🔍 沒有找到與「${q}」相關的餐廳`;
+                    return;
+                }
+
+                status.innerHTML = `✅ 找到 ${hits.length} 筆相關餐廳（AI 向量搜尋）`;
+
+                // Parse restaurant names from results
+                const names = hits.map(h => h.name || h.id || '').filter(Boolean);
+
+                // Highlight matching cards
+                const cards = document.querySelectorAll('.restaurant-card');
+                let matchCount = 0;
+                cards.forEach(card => {
+                    const name = card.querySelector('.card-name')?.textContent || '';
+                    const isMatch = names.some(n => name.includes(n) || n.includes(name.replace(/^[^\w]/,'')));
+                    if (isMatch) {
+                        card.style.boxShadow = '0 0 0 3px var(--accent-coral), 0 8px 32px rgba(255,138,128,0.4)';
+                        card.style.transform = 'translateY(-4px)';
+                        setTimeout(() => {
+                            card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }, 300);
+                        matchCount++;
+                    } else {
+                        card.style.opacity = '0.35';
+                    }
+                });
+
+                // Build result summary
+                const html = `
+                    <div style="background: linear-gradient(135deg, #FFF0F5, #FDF0FF); border-radius: 20px; padding: 20px 24px; margin-bottom: 24px; border: 2px solid rgba(255,182,193,0.3);">
+                        <div style="font-weight: 700; font-size: 15px; color: var(--accent-coral); margin-bottom: 8px;">🤖 AI 搜尋結果</div>
+                        <div style="font-size: 14px; line-height: 1.8; color: var(--text);">
+                            ${hits.map(h => {
+                                const name = h.name || h.id || '?';
+                                const meta = h.metadata || {};
+                                const stars = meta.rating ? '★'.repeat(Math.round(parseFloat(meta.rating))) : '★★★★';
+                                return `<div style="margin-bottom: 6px;">
+                                    <span style="font-weight: 700;">🍽️ ${name}</span>
+                                    <span style="color: #ffb800; margin-left: 6px;">${stars}</span>
+                                    ${meta.price ? `<span style="color: var(--text-dark); margin-left: 8px;">${meta.price}</span>` : ''}
+                                </div>
+                                <div style="font-size: 13px; color: var(--text-dark); margin-left: 18px; margin-bottom: 8px;">${h.content || meta.description || ''}</div>`;
+                            }).join('')}
+                        </div>
+                    </div>`;
+                resultsDiv.innerHTML = html;
+
+                // Reset highlight after 10s
+                setTimeout(() => {
+                    cards.forEach(card => {
+                        card.style.boxShadow = '';
+                        card.style.transform = '';
+                        card.style.opacity = '';
+                    });
+                    status.innerHTML = '';
+                }, 15000);
+
+            } catch (err) {
+                // 如果 API 失敗，安靜降級（不改變畫面）
+                status.innerHTML = '';
+            }
+        }
+
+        // ─── 篩選功能 ───
         function filterAll() {
             document.querySelectorAll('.restaurant-card').forEach(card => {
                 card.style.display = 'block';
+                card.style.opacity = '';
+                card.style.boxShadow = '';
+                card.style.transform = '';
             });
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector('.filter-btn.all').classList.add('active');
+            document.getElementById('searchStatus').innerHTML = '';
+            document.getElementById('searchResults').innerHTML = '';
         }
 
         function filterType(type) {
             document.querySelectorAll('.restaurant-card').forEach(card => {
                 if (card.dataset.type === type) {
                     card.style.display = 'block';
+                    card.style.opacity = '';
+                    card.style.boxShadow = '';
+                    card.style.transform = '';
                 } else {
                     card.style.display = 'none';
                 }
             });
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
+            document.getElementById('searchStatus').innerHTML = '';
+            document.getElementById('searchResults').innerHTML = '';
         }
-    </script>
 </body>
 </html>
